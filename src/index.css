@@ -1,0 +1,51 @@
+html{
+  background-color: #e7ebf0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family:  Tahoma,sans-serif; /*'OpenSans'*/
+}
+
+#root{
+  font-family: Tahoma, sans-serif;
+  font-size: 13px;
+}
+
+button,
+a{
+  cursor: pointer;
+}
+
+button:disabled{
+  cursor: not-allowed;
+}
+
+a{
+  text-decoration: none;
+}
+
+button {
+  padding: 0;
+}
+
+ol,
+ul{
+  margin: 0;
+  list-style: none;
+  padding: 0;
+}
+
+input,
+textarea{
+  font-size: 13px;
+  font-family:  -apple-system, BlinkMacSystemFont, 'Roboto', Tahoma, sans-serif;
+}
+
+input:hover,
+input:focus,
+textarea:hover,
+textarea:focus{
+  outline: none;
+}
