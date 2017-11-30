@@ -15,10 +15,10 @@ const Main = ({chat,location}) => {
           {chat ? chat.user.name : ''}
           <span className="comment">{chat ? chat.chat[0].date: ''}</span>
         </button>
-        <button type="button" className="_header-button">
-          Кнопка</button>
         <Link to="/" type="button" className="_header-button" onClick={() => (chat = null)}>
           Назад</Link>
+        <button type="button" className="_header-button">
+          Удалить</button>
       </header>
       <Route exact path="/" component={EmptyList}/>
       <Route path='/chat/:id' component={Chat} chat={chat}/>

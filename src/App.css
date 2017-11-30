@@ -247,7 +247,8 @@
             width: 36px;
             height: 36px;
             font-size: 16px;
-            background-color: #9cacb9; }
+            background-color: #9cacb9;
+            cursor: pointer; }
             .main-block .chat-list .history .chat li .avatar.my {
               background-color: #5682a3; }
           .main-block .chat-list .history .chat li .content {

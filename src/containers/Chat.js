@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 //import { connect } from 'react-redux'
-import Textarea from "react-textarea-autosize";
+import { Link } from 'react-router-dom';
 import Ionicon from 'react-ionicons';
 import { Scrollbars } from 'react-custom-scrollbars';
+
+import MessageForm from './MessageForm';
 
 class Chat extends Component {
   constructor(props){
@@ -15,7 +17,9 @@ class Chat extends Component {
         startDate: new Date().toDateString(),
       },
       isLoadingMessages: true,
-      messages: []
+      messages: [],
+      error: null,
+      selectedMessages: []
     }
   }
 
@@ -25,10 +29,13 @@ class Chat extends Component {
 
   getChat(chatId){
     var token = 'ewfwefwefwef';
-
+    this.setState({
+      isLoadingMessages: true
+    })
     axios({
       method: 'get',
       url: 'http://ktotyt.com/messages',
+      params: {sort: '-id'},
       data: {
         message: 'wefwefwef'
       },
@@ -36,14 +43,18 @@ class Chat extends Component {
         Authorization: `Bearer ${token}`
       }
     }).then(response =>{
-      console.log('messages chat', response);
       this.setState({
         messages: response.data,
         isLoadingMessages: false
       })
+      console.log('getChat', response.data);
 
     }).catch(error => {
       console.log('catch-messages', error);
+      this.setState({
+        isLoadingMessages: false,
+        error: error
+      })
     });
   }
 
@@ -51,15 +62,40 @@ class Chat extends Component {
    var nextChatId = nextProps.match.params.id;
     if (nextChatId !== this.props.match.params.id) {
       this.getChat(nextChatId);
-      /*this.setState({
-        text: '',
-        chat: {
-          id: this.props.match.params.id,
-          startDate: new Date().toDateString(),
-          chat: []
-        }
-      })*/
     }
+  }
+
+  toggleSelectMessage(id=null){
+    console.log(id,this.state.selectedMessages);
+    var messages = this.state.selectedMessages;
+    if(id){
+      if(messages.indexOf(id) == -1){
+        messages.push(id)
+      }else{
+        messages.splice(messages.indexOf(id), 1);
+      }
+      this.setState({
+        selectedMessages: messages
+      })
+      console.log(this.state.selectedMessages)
+    }
+
+      /*axios({
+        method: 'delete',
+        url: `http://ktotyt.com/messages/${id}`,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }).then(response =>{
+        console.log('pushMessage',response);
+        this.getChat();
+      }).catch(error => {
+        console.log('pushMessage-catch', error);
+        this.setState({
+          error: error
+        })
+      });
+    }*/
   }
 
   getStatus(status){
@@ -88,46 +124,49 @@ class Chat extends Component {
   }
 
   pushMessage(value){
-    let chat = {...this.state.chat};
-    chat.chat.push( {
-      text: value,
-      author: 'you',
-      date: new Date().toDateString(),
-      status: 'new'
-    })
     this.setState({
-      chat: chat,
-      text: ''
+      isLoadingMessages: true
     })
+    var token = 'ewfwefwefwef';
+    axios({
+      method: 'post',
+      url: 'http://ktotyt.com/messages',
+      data: {
+        message: value
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(response =>{
+      console.log('pushMessage',response);
+      this.getChat();
+    }).catch(error => {
+      console.log('pushMessage-catch', error);
+      this.setState({
+        error: error
+      })
+    });
 
     return this.state;
   }
 
-  handleTest(e) {
-    if (e.charCode === 13 || e.keyCode === 13) {
-      if(!this.state.text){
-        e.preventDefault();
-        return;
-      }
-      if(!e.shiftKey){
-        e.preventDefault()
-        this.pushMessage(this.state.text);
-        return this.state.text;
-      }
+  isSelectedMessage(messageId){
+   return this.state.selectedMessages.indexOf(messageId) !== -1;
+  }
+
+  messagePhoto(message){
+    if(this.isSelectedMessage(message.id)){
+      return (<Ionicon icon="md-checkmark" fontSize="26px" color="#ffffff"/>);
+    }else{
+      return message.author === 'you' ? 'Вы'.toUpperCase() : 'Незнакомец'[0].toUpperCase();
     }
   }
 
-  handleChange(value){
-    this.setState({
-      text: value
-    })
-    return value;
-  }
 
   render(){
     if (this.state.isLoadingMessages) {
       return (<div className="loader">
-        <Ionicon icon="ios-refresh" fontSize="60px" color="#347eff" rotate={true} />
+        <Ionicon icon="ios-refresh" fontSize="60px" color="#347eff" rotate={true}/>
       </div>);
     }
     //let chat = this.state.chat;
@@ -139,15 +178,15 @@ class Chat extends Component {
               {
                 this.state.messages ?
                   this.state.messages.map((dialog, index) => (
-                  <li key={index}>
+                  <li key={dialog.id}>
 
-                    <div className={'_photo avatar avatar' + (dialog.author === 'you' ? ' my' : '')}>
-                      {dialog.author === 'you' ? 'Вы'.toUpperCase() : 'Незнакомец'[0].toUpperCase()}
+                    <div className={'_photo avatar avatar' + (dialog.author === 'you' ? ' my' : '')} onClick={this.toggleSelectMessage.bind(this,dialog.id)}>
+                      {this.messagePhoto(dialog)}
                     </div>
 
                     <div className='content'>
                       <div className='author'>{dialog.author === 'you' ? 'Вы' : 'Незнакомец'} <span
-                        className='date'>{dialog.date}</span></div>
+                        className='date'>{dialog.created_time}</span></div>
                       <div className='text-wrapper'>
                         <div className="text">{dialog.message}</div>
                       </div>
@@ -163,14 +202,7 @@ class Chat extends Component {
             </ul>
           </Scrollbars>
         </div>
-        <form className="message" onSubmit={ this.pushMessage.bind(this,this.state.text)} onKeyPress={(event) => this.handleTest(event,this)}>
-          <div className="textarea">
-            <Textarea placeholder="Напишите сообщение..." value={this.state.text} onChange={(event) => this.handleChange(event.target.value)}/>
-          </div>
-          <button type="submit" className="enter" disabled={!this.state.text || this.state.text === ''} onClick={this.pushMessage.bind(this,this.state.text)}>
-            <Ionicon className="plane" icon="ios-paper-plane" fontSize="22px" color="#6490b1"/>
-          </button>
-        </form>
+        <MessageForm pushMessage={this.pushMessage.bind(this)} disabledForm={this.state.isLoadingMessages}/>
       </div>
     )
   }
