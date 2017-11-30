@@ -8,7 +8,6 @@ import Chat from '../../containers/Chat';
 
 
 const Main = ({chat,location}) => {
-  console.log(location);
   return (
     <div className="main-block">
       <header className="header">

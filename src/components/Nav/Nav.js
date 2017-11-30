@@ -5,6 +5,19 @@ import key from '../../keyhole.svg';
 import ChatList from '../../containers/ContactsList';
 
 class Nav extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      contacts: true
+    };
+  }
+
+  toggleSearchList(){
+    this.setState({
+      contacts: !this.state.contacts
+    });
+  }
+
   render() {
     return (
       <div className="left-block">
@@ -15,12 +28,17 @@ class Nav extends Component {
             </div>
             <span className="title">KтоТут</span>
           </button>
-          <button type="button" className="_header-button search-button">
-            Поиск
+          <button className="_header-button search-button" onClick={this.toggleSearchList.bind(this)}>
+            {this.state.contacts ? 'Поиск' : 'Назад'}
             <Ionicon icon="ios-arrow-forward" fontSize="22px" color="#b9cfe3" className="search-arrow"/>
           </button>
         </header>
-        <ChatList />
+        {
+          this.state.contacts ?
+            <ChatList />:
+            <div>Search list</div>
+        }
+
       </div>
     );
   }

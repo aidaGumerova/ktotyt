@@ -487,6 +487,13 @@ $ColorBlue: #5682a3;
   }
 }
 
+.loader{
+  display: flex;
+
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
 
 
 /*{background-color:#a4c4dd}*/

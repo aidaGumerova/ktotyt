@@ -301,6 +301,12 @@
         border-radius: 6px;
         resize: none; }
 
+.loader {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center; }
+
 /*{background-color:#a4c4dd}*/
 @media (max-width: 1000px), (max-height: 450px) {
   .footer {
